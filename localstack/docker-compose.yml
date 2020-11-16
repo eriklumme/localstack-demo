@@ -1,0 +1,24 @@
+version: '2.1'
+
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack
+    network_mode: bridge
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      # Run the services S3 (Simple Storage Service), SES (Simple Email Service)
+      - SERVICES=s3,ses
+      - DEBUG=${DEBUG- }
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR}
+      - START_WEB=0
+    volumes:
+      # Bind the localstack data directory to ./data
+      - "./data:/tmp/localstack/data"
+      # Allow us to place any shell files in ./bin to be executed upon startup
+      - "./bin:/docker-entrypoint-initaws.d"
+      - "/var/run/docker.sock:/var/run/docker.sock"
